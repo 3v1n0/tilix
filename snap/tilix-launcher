@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# On Fedora $SNAP is under /var and there is some magic to map it to /snap.
+# We need to handle that case and reset $SNAP
+SNAP=`echo $SNAP | sed -e "s|/var/lib/snapd||g"`
+
+if [ "$SNAP_ARCH" == "amd64" ]; then
+  ARCH="x86_64-linux-gnu"
+elif [ "$SNAP_ARCH" == "armhf" ]; then
+  ARCH="arm-linux-gnueabihf"
+elif [ "$SNAP_ARCH" == "arm64" ]; then
+  ARCH="aarch64-linux-gnu"
+else
+  ARCH="$SNAP_ARCH-linux-gnu"
+fi
+
+RUNTIME=$SNAP/gnome-platform
+
+export LD_PRELOAD=$RUNTIME/lib/$ARCH/libglib-2.0.so.0
+export LD_LIBRARY_PATH="$SNAP/usr/lib:$SNAP/lib/$ARCH:$SNAP/usr/lib/$ARCH:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$RUNTIME/usr/lib:$RUNTIME/usr/lib/$ARCH:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$RUNTIME/lib/$ARCH:$RUNTIME/lib:$LD_LIBRARY_PATH"
+export XDG_DATA_DIRS="$SNAP/usr/share:$RUNTIME/usr/share:$XDG_DATA_DIRS"
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+export XDG_CONFIG_DIRS="$SNAP/etc/xdg:$RUNTIME/etc/xdg:$XDG_CONFIG_DIRS"
+
+export GTK_PATH=$RUNTIME/usr/lib/$ARCH/gtk-3.0
+
+exec $SNAP/usr/bin/tilix $@

@@ -1,0 +1,84 @@
+name: tilix
+adopt-info: tilix
+version: git
+version-script: git describe --tags
+icon: data/icons/hicolor/512x512/apps/com.gexperts.Tilix.png
+# license: MPL-2.0
+description: |
+  Tilix is a tiling terminal emulator.
+  It lets you:
+    • Layout terminals in any fashion by splitting them horizontally or
+      vertically
+    • Terminals can be re-arranged using drag and drop both within and between
+      windows
+    • Terminals can be detached into a new window via drag and drop
+    • Input can be synchronized between terminals so commands typed in one
+      terminal are replicated to the others
+    • The grouping of terminals can be saved and loaded from disk
+    • Terminals support custom titles
+    • Color schemes are stored in files and custom color schemes can be created
+      by simply creating a new file
+    • Transparent background
+    • Supports notifications when processes are completed out of view
+
+  The application was written using GTK 3 and an effort was made to conform to
+  GNOME Human Interface Guidelines (HIG). As a result, it does use client
+  side-decorations, though it can be disabled if necessary.
+
+  Tilix has been tested with GNOME and with Unity.
+
+grade: stable
+confinement: classic
+
+parts:
+  ldc:
+    plugin: nil
+    build-packages:
+      - curl
+    override-build:
+      curl -fsS https://dlang.org/install.sh | bash -s ldc -p $SNAPCRAFT_PART_INSTALL
+    prime: [-./*]
+
+  vte:
+    plugin: nil
+    build-attributes: ['no-system-libraries']
+    stage-packages: ['libvte-2.91-0']
+    prime: [usr/lib/*/libvte*.so.*]
+
+  tilix:
+    plugin: nil
+    source: .
+    parse-info: [usr/share/metainfo/com.gexperts.Tilix.appdata.xml]
+    build-packages:
+      - dub
+      - gnome-pkg-tools
+    build-attributes: ['no-system-libraries']
+    override-build: |
+      set -x
+      . $SNAPCRAFT_STAGE/ldc-*/activate
+      HOME=$PWD dub build --build=release --compiler=ldc2 --verbose
+      ./install.sh $SNAPCRAFT_PART_INSTALL/usr
+      ln -sfv /snap/gnome-3-26-1604/current $SNAPCRAFT_PART_INSTALL/gnome-platform
+    after:
+     - ldc
+
+  launch-wrapper:
+    plugin: nil
+    source: snap
+    override-build: |
+      set +x
+      install -D -m755 tilix-launcher $SNAPCRAFT_PART_INSTALL/bin/tilix.wrapper
+
+plugs:
+  gnome-3-26-1604:
+    interface: content
+    target: $SNAP/gnome-platform
+    default-provider: gnome-3-26-1604
+
+apps:
+  tilix:
+    environment:
+      PATH: $SNAP/bin:$PATH
+    command: tilix.wrapper
+    common-id: com.gexperts.Tilix
+    desktop: usr/share/applications/com.gexperts.Tilix.desktop
