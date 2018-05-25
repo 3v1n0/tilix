@@ -79,6 +79,7 @@ parts:
       RUNTIME_PATH=/snap/gnome-3-26-1604/current
       RUNTIME_SNAP=$SNAPCRAFT_PART_INSTALL/runtime
       ln -sfv $RUNTIME_PATH $RUNTIME_SNAP
+      sed "s,@ARCH@,$SNAPCRAFT_ARCH_TRIPLET,g" tilix-launcher.in > tilix-launcher
       install -D -m755 tilix-launcher $SNAPCRAFT_PART_INSTALL/bin/tilix.wrapper
 
 plugs:
