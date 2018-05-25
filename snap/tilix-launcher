@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# On Fedora $SNAP is under /var and there is some magic to map it to /snap.
-# We need to handle that case and reset $SNAP
-SNAP=`echo $SNAP | sed -e "s|/var/lib/snapd||g"`
+# On Fedora $SNAP is under /var and we don't support it in classic snaps
+if [[ $SNAP != /snap/* ]]; then
+  echo -e "Snaps using classic confinement as $SNAP_NAME, also require a symlink" \
+          "from '/var/lib/snapd/snap\` to 'snap\`:\n" \
+          "  sudo ln -s /var/lib/snapd/snap /snap"
+  exit 1
+fi
 
 if [ "$SNAP_ARCH" == "amd64" ]; then
   ARCH="x86_64-linux-gnu"
