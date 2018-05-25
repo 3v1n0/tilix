@@ -42,8 +42,13 @@ parts:
   vte:
     plugin: nil
     build-attributes: ['no-system-libraries']
+    build-packages: ['patchelf']
     stage-packages: ['libvte-2.91-0']
     prime: [usr/lib/*/libvte*.so.*]
+    override-prime: |
+      snapcraftctl prime
+      env SNAPCRAFT_RPATH_RUNTIMES="gnome-3-26-1604" \
+        $SNAPCRAFT_PRIME/../snap/set-snap-rpaths.sh $SNAPCRAFT_PRIME/usr/lib/*/*.so.*
 
   tilix:
     plugin: nil
@@ -56,6 +61,7 @@ parts:
       - libgtk-3-dev
       - libgtk2.0-bin
       - libvte-2.91-dev
+      - patchelf
       - xdg-utils
     build-attributes: ['no-system-libraries']
     override-build: |
@@ -63,7 +69,10 @@ parts:
       . $SNAPCRAFT_STAGE/ldc-*/activate
       HOME=$PWD dub build --build=release --compiler=ldc2 --verbose
       ./install.sh $SNAPCRAFT_PART_INSTALL/usr
-      ln -sfv /snap/gnome-3-26-1604/current $SNAPCRAFT_PART_INSTALL/gnome-platform
+    override-prime: |
+      snapcraftctl prime
+      env SNAPCRAFT_RPATH_RUNTIMES="gnome-3-26-1604" \
+        $SNAPCRAFT_PRIME/../snap/set-snap-rpaths.sh $SNAPCRAFT_PRIME/usr/bin/*
     after:
      - ldc
 
@@ -72,6 +81,9 @@ parts:
     source: snap
     override-build: |
       set +x
+      RUNTIME_PATH=/snap/gnome-3-26-1604/current
+      RUNTIME_SNAP=$SNAPCRAFT_PART_INSTALL/runtime
+      ln -sfv $RUNTIME_PATH $RUNTIME_SNAP
       install -D -m755 tilix-launcher $SNAPCRAFT_PART_INSTALL/bin/tilix.wrapper
 
 plugs:
