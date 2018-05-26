@@ -2840,6 +2840,33 @@ private:
 
             return result;
         } else {
+            static if (SNAP) {
+                string[string] envParent = environment.toAA();
+
+                if ("SNAP" in envParent) {
+                    string snap = envParent["SNAP"];
+
+                    foreach(key; envParent.byKey()) {
+                        string newValue;
+                        string value = envParent[key];
+                        if (key == "SNAP" || key.startsWith("SNAP_")) {
+                            envv ~= ["TILIX_" ~ key ~ "=" ~ value];
+                        } else {
+                            string[] cleanedValues;
+                            foreach(var; value.split(":")) {
+                                if (!var.startsWith(snap)) {
+                                    cleanedValues ~= var;
+                                }
+                            }
+                            newValue = cleanedValues.join(":");
+                        }
+
+                        if (value != newValue) {
+                            envv ~= [key ~ "=" ~ newValue];
+                        }
+                    }
+                }
+            }
             return vte.spawnSync(VtePtyFlags.DEFAULT, workingDir, args, envv, flags, null, null, gpid, null);
         }
     }
