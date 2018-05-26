@@ -1,4 +1,4 @@
-name: tilix
+name: tilix-test
 adopt-info: tilix
 version: git
 version-script: git describe --tags
@@ -107,7 +107,7 @@ plugs:
     default-provider: gtk-common-themes
 
 apps:
-  tilix:
+  tilix-test:
     environment:
       PATH: $SNAP/bin:$PATH
     command: tilix.wrapper
