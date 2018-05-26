@@ -36,6 +36,11 @@ immutable bool USE_FILE_LOGGING = false;
 immutable bool FLATPAK = false;
 
 /**
+ * When true builds the application for snap
+ */
+immutable bool SNAP = false;
+
+/**
  * Determines whether synchronization of multiple terminals
  * is driven off of the commit event or by keystrokes. The commit
  * event allows for IME to work but causes some issues with

@@ -1,0 +1,13 @@
+diff --git a/source/gx/tilix/constants.d b/source/gx/tilix/constants.d
+index 6eea2da..15bf9e0 100644
+--- a/source/gx/tilix/constants.d
++++ b/source/gx/tilix/constants.d
+@@ -38,7 +38,7 @@ immutable bool FLATPAK = false;
+ /**
+  * When true builds the application for snap
+  */
+-immutable bool SNAP = false;
++immutable bool SNAP = true;
+ 
+ /**
+  * Determines whether synchronization of multiple terminals

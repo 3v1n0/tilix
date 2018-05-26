@@ -57,8 +57,12 @@ parts:
     build-packages:
       - dub
       - gnome-pkg-tools
+      - patch
       - patchelf
     build-attributes: ['no-system-libraries']
+    override-pull: |
+      snapcraftctl pull
+      patch -p1 < $SNAPCRAFT_STAGE/../snap/snap-enable.patch
     override-build: |
       set -x
       . $SNAPCRAFT_STAGE/ldc-*/activate
