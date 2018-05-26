@@ -2849,9 +2849,7 @@ private:
                     foreach(key; envParent.byKey()) {
                         string newValue;
                         string value = envParent[key];
-                        if (key == "SNAP" || key.startsWith("SNAP_")) {
-                            envv ~= ["TILIX_" ~ key ~ "=" ~ value];
-                        } else {
+                        if (key != "SNAP" && !key.startsWith("SNAP_")) {
                             string[] cleanedValues;
                             foreach(var; value.split(":")) {
                                 if (!var.startsWith(snap)) {
@@ -2862,7 +2860,11 @@ private:
                         }
 
                         if (value != newValue) {
-                            envv ~= [key ~ "=" ~ newValue];
+                            if (newValue) {
+                                envv ~= [key ~ "=" ~ newValue];
+                            } else {
+                                environment.remove(key);
+                            }
                         }
                     }
                 }
