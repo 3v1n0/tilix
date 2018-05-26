@@ -20,6 +20,12 @@ data/man/man
 build/builddir
 .xdg-app-builder
 
+parts/
+prime/
+stage/
+snap/.snapcraft/
+*.snap
+
 ABOUT-NLS
 Makefile
 Makefile.in
