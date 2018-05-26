@@ -82,8 +82,12 @@ parts:
     override-build: |
       set +x
       RUNTIME=/snap/gnome-3-26-1604/current
+      THEMES=/snap/gtk-common-themes/current
       ln -snfv $RUNTIME $SNAPCRAFT_PART_INSTALL/runtime
-      sed "s,@ARCH@,$SNAPCRAFT_ARCH_TRIPLET,g;s,@RUNTIME@,\$SNAP/runtime,g;" \
+      ln -snfv $THEMES $SNAPCRAFT_PART_INSTALL/themes
+      sed "s,@ARCH@,$SNAPCRAFT_ARCH_TRIPLET,g
+           s,@RUNTIME@,\$SNAP/runtime,g
+           s,@DATADIRS@,\$SNAP/themes/share,g" \
           tilix-launcher.in > tilix-launcher
       install -D -m755 tilix-launcher $SNAPCRAFT_PART_INSTALL/bin/tilix.wrapper
 
@@ -92,6 +96,11 @@ plugs:
     interface: content
     target: $SNAP/runtime
     default-provider: gnome-3-26-1604
+
+  common-themes:
+    interface: content
+    target: $SNAP/themes
+    default-provider: gtk-common-themes
 
 apps:
   tilix:
