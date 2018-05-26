@@ -19,4 +19,8 @@ for cnt in $SNAPCRAFT_PROJECT_NAME $SNAPCRAFT_RPATH_RUNTIMES core; do
   rpath+=":/snap/$cnt/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
 done
 
-patchelf --force-rpath --set-rpath "$rpath" $@
+for f in $*; do
+  if [ -f "$f" ] && ! [ -L "$f" ]; then
+    patchelf --force-rpath --set-rpath "$rpath" "$f"
+  fi
+done
