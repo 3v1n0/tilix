@@ -40,15 +40,38 @@ parts:
     prime: [-./*]
 
   vte:
-    plugin: nil
+    plugin: autotools
+    source: https://gitlab.gnome.org/GNOME/vte.git
+    source-depth: 1
+    source-tag: vte-0-52
     build-attributes: ['no-system-libraries']
-    build-packages: ['patchelf']
-    stage-packages: ['libvte-2.91-0']
-    prime: [usr/lib/*/libvte*.so.*]
+    build-packages:
+      - gettext
+      - intltool
+      - libglib2.0-dev
+      - libgnutls28-dev
+      - libgtk-3-dev
+      - libpango1.0-dev
+      - libpcre2-dev
+      - patchelf
+    stage-packages:
+      - libpcre2-8-0
+    configflags:
+      - --prefix=/usr
+      - --disable-gtk-doc
+      - --disable-vala
+      - --enable-introspection=no
+      - --with-gnutls
+    prime:
+      - usr/lib/*.so.*
+      - usr/lib/*/*.so.*
+      - usr/share/locale/**
     override-prime: |
       snapcraftctl prime
       env SNAPCRAFT_RPATH_RUNTIMES="gnome-3-26-1604" \
-        $SNAPCRAFT_PRIME/../snap/set-snap-rpaths.sh $SNAPCRAFT_PRIME/usr/lib/*/*.so.*
+        $SNAPCRAFT_PRIME/../snap/set-snap-rpaths.sh \
+          $SNAPCRAFT_PRIME/usr/lib/*.so.* \
+          $SNAPCRAFT_PRIME/usr/lib/*/*.so.*
 
   tilix:
     plugin: nil
@@ -60,7 +83,6 @@ parts:
       - gettext
       - libgtk-3-dev
       - libgtk2.0-bin
-      - libvte-2.91-dev
       - patch
       - patchelf
       - xdg-utils
@@ -78,7 +100,8 @@ parts:
       env SNAPCRAFT_RPATH_RUNTIMES="gnome-3-26-1604" \
         $SNAPCRAFT_PRIME/../snap/set-snap-rpaths.sh $SNAPCRAFT_PRIME/usr/bin/*
     after:
-     - ldc
+      - vte
+      - ldc
 
   launch-wrapper:
     plugin: nil
